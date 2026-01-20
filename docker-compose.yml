@@ -1,0 +1,79 @@
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            args:
+                user: laravel
+                uid: 1000
+        image: osrs-ge-app
+        container_name: osrs-ge-app
+        restart: unless-stopped
+        working_dir: /var/www
+        volumes:
+            - ./:/var/www
+        environment:
+            DB_CONNECTION: mysql
+            DB_HOST: db
+            DB_PORT: 3306
+            DB_DATABASE: ${DB_DATABASE:-osrs_ge}
+            DB_USERNAME: ${DB_USERNAME:-laravel}
+            DB_PASSWORD: ${DB_PASSWORD:-password}
+            REDIS_HOST: redis
+            CACHE_STORE: redis
+            SESSION_DRIVER: redis
+            QUEUE_CONNECTION: redis
+        networks:
+            - osrs-ge-network
+        depends_on:
+            - db
+            - redis
+
+    web:
+        image: nginx:alpine
+        container_name: osrs-ge-nginx
+        restart: unless-stopped
+        ports:
+            - "8000:80"
+        volumes:
+            - ./:/var/www
+            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+        networks:
+            - osrs-ge-network
+        depends_on:
+            - app
+
+    db:
+        image: mysql:8.0
+        container_name: osrs-ge-mysql
+        restart: unless-stopped
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE:-osrs_ge}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-password}
+            MYSQL_PASSWORD: ${DB_PASSWORD:-password}
+            MYSQL_USER: ${DB_USERNAME:-laravel}
+            SERVICE_TAGS: dev
+            SERVICE_NAME: mysql
+        volumes:
+            - dbdata:/var/lib/mysql
+        networks:
+            - osrs-ge-network
+        ports:
+            - "3306:3306"
+
+    redis:
+        image: redis:alpine
+        container_name: osrs-ge-redis
+        restart: unless-stopped
+        networks:
+            - osrs-ge-network
+        volumes:
+            - redisdata:/data
+
+networks:
+    osrs-ge-network:
+        driver: bridge
+
+volumes:
+    dbdata:
+    redisdata:

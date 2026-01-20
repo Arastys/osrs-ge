@@ -1,0 +1,17 @@
+{
+    "name": "OSRS GE Item Tracker",
+    "short_name": "OSRS GE",
+    "description": "Track OSRS Grand Exchange prices and set alerts.",
+    "start_url": "/dashboard",
+    "display": "standalone",
+    "background_color": "#090901",
+    "theme_color": "#f97316",
+    "icons": [
+        {
+            "src": "/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}

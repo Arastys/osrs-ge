@@ -58,7 +58,22 @@ class User extends Authenticatable
         return Str::of($this->name)
             ->explode(' ')
             ->take(2)
-            ->map(fn ($word) => Str::substr($word, 0, 1))
+            ->map(fn($word) => Str::substr($word, 0, 1))
             ->implode('');
+    }
+
+    public function itemAlerts()
+    {
+        return $this->hasMany(ItemAlert::class);
+    }
+
+    public function alertLogs()
+    {
+        return $this->hasManyThrough(AlertLog::class, ItemAlert::class);
+    }
+
+    public function portfolios()
+    {
+        return $this->hasMany(Portfolio::class);
     }
 }
