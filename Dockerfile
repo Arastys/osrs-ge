@@ -42,3 +42,12 @@ RUN mkdir -p /home/$user/.composer && \
 WORKDIR /var/www
 
 USER $user
+
+# Copy code
+COPY --chown=$user:$user . /var/www
+
+# Install dependencies
+RUN composer install --no-interaction --optimize-autoloader --no-dev
+
+# Build frontend
+RUN npm install && npm run build
